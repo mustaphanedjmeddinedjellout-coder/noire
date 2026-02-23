@@ -10,6 +10,10 @@ export async function saveUploadedImages(files: File[]) {
     return [] as string[];
   }
 
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    throw new Error('BLOB_READ_WRITE_TOKEN is not set. Please connect Vercel Blob storage to this project.');
+  }
+
   const urls: string[] = [];
 
   for (const file of validFiles) {
