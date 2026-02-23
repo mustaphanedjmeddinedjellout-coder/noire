@@ -62,7 +62,7 @@ const IconTrash = ({ size = 13 }: { size?: number }) => (
 export function ProductCreateForm({
   action,
 }: {
-  action: (formData: FormData) => Promise<void>;
+  action: (formData: FormData) => Promise<{ error: string } | void>;
 }) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -203,12 +203,16 @@ export function ProductCreateForm({
 
     startTransition(async () => {
       try {
-        await action(fd);
-        showToast('success', 'Product created successfully!');
-        setOpen(false);
-        resetForm();
+        const result = await action(fd);
+        if (result && 'error' in result) {
+          showToast('error', result.error);
+        } else {
+          showToast('success', 'Product created successfully!');
+          setOpen(false);
+          resetForm();
+        }
       } catch (error) {
-        showToast('error', error instanceof Error ? error.message : 'Failed to create product');
+        showToast('error', error instanceof Error ? error.message : 'Failed to create product. Check Vercel logs for details.');
       }
     });
   };

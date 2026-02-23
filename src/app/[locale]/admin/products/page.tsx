@@ -67,75 +67,80 @@ async function syncProductStock(productId: string) {
   await prisma.product.update({ where: { id: productId }, data: { stock: aggregate._sum.stock ?? 0 } });
 }
 
-async function createProduct(formData: FormData) {
+async function createProduct(formData: FormData): Promise<{ error: string } | void> {
   'use server';
-  const category = formData.get('category') as ProductCategory;
-  const slug = String(formData.get('slug') ?? '').trim();
-  const variantsJson = String(formData.get('variantsJson') ?? '[]');
-  const parsedVariants = sanitizeVariants(JSON.parse(variantsJson) as VariantInput[]);
-  const priceDzd = Number(formData.get('priceDzd') ?? 0);
-  const saleRaw = String(formData.get('salePriceDzd') ?? '').trim();
-  const salePriceDzd = saleRaw ? Number(saleRaw) : null;
-
-  if (!slug) throw new Error('Slug is required');
-  const existing = await prisma.product.findUnique({ where: { slug }, select: { id: true } });
-  if (existing) throw new Error(`Slug "${slug}" already exists. Please choose a different slug.`);
-
-  if (parsedVariants.length === 0) throw new Error('At least one size/color variant is required');
-  if (priceDzd <= 0) throw new Error('Price must be greater than 0');
-  if (salePriceDzd !== null && (salePriceDzd <= 0 || salePriceDzd >= priceDzd)) {
-    throw new Error('Sale price must be lower than regular price');
-  }
-
-  const files = formData.getAll('images').filter((f): f is File => f instanceof File && f.size > 0);
-
-  let uploadedImageUrls: string[] = [];
   try {
-    uploadedImageUrls = await saveUploadedImages(files);
-  } catch (uploadError) {
-    console.error('[createProduct] Image upload failed:', uploadError);
-    throw new Error(`Image upload failed: ${uploadError instanceof Error ? uploadError.message : String(uploadError)}`);
-  }
+    const category = formData.get('category') as ProductCategory;
+    const slug = String(formData.get('slug') ?? '').trim();
+    const variantsJson = String(formData.get('variantsJson') ?? '[]');
+    const parsedVariants = sanitizeVariants(JSON.parse(variantsJson) as VariantInput[]);
+    const priceDzd = Number(formData.get('priceDzd') ?? 0);
+    const saleRaw = String(formData.get('salePriceDzd') ?? '').trim();
+    const salePriceDzd = saleRaw ? Number(saleRaw) : null;
 
-  if (uploadedImageUrls.length === 0) throw new Error('Please upload at least one JPG/PNG image');
+    if (!slug) return { error: 'Slug is required' };
+    const existing = await prisma.product.findUnique({ where: { slug }, select: { id: true } });
+    if (existing) return { error: `Slug "${slug}" already exists. Please choose a different slug.` };
 
-  const colorTagsRaw = String(formData.get('imageColorTagsJson') ?? 'null');
-  const colorTagsArr: (string | null)[] = (() => {
-    try { return JSON.parse(colorTagsRaw) ?? []; } catch { return []; }
-  })();
-
-  try {
-    await prisma.product.create({
-      data: {
-        slug, category,
-        titleEn: String(formData.get('titleEn') ?? ''), titleFr: String(formData.get('titleFr') ?? ''), titleAr: String(formData.get('titleAr') ?? ''),
-        descriptionEn: String(formData.get('descriptionEn') ?? ''), descriptionFr: String(formData.get('descriptionFr') ?? ''), descriptionAr: String(formData.get('descriptionAr') ?? ''),
-        priceDzd,
-        salePriceDzd,
-        stock: parsedVariants.reduce((sum, v) => sum + v.stock, 0),
-        featured: formData.get('featured') === 'on',
-        published: true,
-        images: {
-          create: uploadedImageUrls.map((url, index) => ({
-            url,
-            altEn: 'Product image',
-            altFr: 'Image produit',
-            altAr: 'صورة المنتج',
-            sortOrder: index,
-            ...(colorTagsArr[index] ? { colorTag: colorTagsArr[index] } : {}),
-          } as any))
-        },
-        variants: { create: parsedVariants }
-      }
-    });
-  } catch (error) {
-    console.error('[createProduct] Database error:', error);
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-      throw new Error(`Slug "${slug}" already exists. Please choose a different slug.`);
+    if (parsedVariants.length === 0) return { error: 'At least one size/color variant is required' };
+    if (priceDzd <= 0) return { error: 'Price must be greater than 0' };
+    if (salePriceDzd !== null && (salePriceDzd <= 0 || salePriceDzd >= priceDzd)) {
+      return { error: 'Sale price must be lower than regular price' };
     }
-    throw error;
+
+    const files = formData.getAll('images').filter((f): f is File => f instanceof File && f.size > 0);
+
+    let uploadedImageUrls: string[] = [];
+    try {
+      uploadedImageUrls = await saveUploadedImages(files);
+    } catch (uploadError) {
+      console.error('[createProduct] Image upload failed:', uploadError);
+      return { error: `Image upload failed: ${uploadError instanceof Error ? uploadError.message : String(uploadError)}` };
+    }
+
+    if (uploadedImageUrls.length === 0) return { error: 'Please upload at least one JPG/PNG image' };
+
+    const colorTagsRaw = String(formData.get('imageColorTagsJson') ?? 'null');
+    const colorTagsArr: (string | null)[] = (() => {
+      try { return JSON.parse(colorTagsRaw) ?? []; } catch { return []; }
+    })();
+
+    try {
+      await prisma.product.create({
+        data: {
+          slug, category,
+          titleEn: String(formData.get('titleEn') ?? ''), titleFr: String(formData.get('titleFr') ?? ''), titleAr: String(formData.get('titleAr') ?? ''),
+          descriptionEn: String(formData.get('descriptionEn') ?? ''), descriptionFr: String(formData.get('descriptionFr') ?? ''), descriptionAr: String(formData.get('descriptionAr') ?? ''),
+          priceDzd,
+          salePriceDzd,
+          stock: parsedVariants.reduce((sum, v) => sum + v.stock, 0),
+          featured: formData.get('featured') === 'on',
+          published: true,
+          images: {
+            create: uploadedImageUrls.map((url, index) => ({
+              url,
+              altEn: 'Product image',
+              altFr: 'Image produit',
+              altAr: 'صورة المنتج',
+              sortOrder: index,
+              ...(colorTagsArr[index] ? { colorTag: colorTagsArr[index] } : {}),
+            } as any))
+          },
+          variants: { create: parsedVariants }
+        }
+      });
+    } catch (dbError) {
+      console.error('[createProduct] Database error:', dbError);
+      if (dbError instanceof Prisma.PrismaClientKnownRequestError && dbError.code === 'P2002') {
+        return { error: `Slug "${slug}" already exists. Please choose a different slug.` };
+      }
+      return { error: `Database error: ${dbError instanceof Error ? dbError.message : String(dbError)}` };
+    }
+    revalidatePath('/');
+  } catch (err) {
+    console.error('[createProduct] Unexpected error:', err);
+    return { error: `Unexpected error: ${err instanceof Error ? err.message : String(err)}` };
   }
-  revalidatePath('/');
 }
 
 async function updateProduct(formData: FormData) {
