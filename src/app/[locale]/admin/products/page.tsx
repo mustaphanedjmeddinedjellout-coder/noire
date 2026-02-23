@@ -88,7 +88,14 @@ async function createProduct(formData: FormData) {
   }
 
   const files = formData.getAll('images').filter((f): f is File => f instanceof File && f.size > 0);
-  const uploadedImageUrls = await saveUploadedImages(files);
+
+  let uploadedImageUrls: string[] = [];
+  try {
+    uploadedImageUrls = await saveUploadedImages(files);
+  } catch (uploadError) {
+    console.error('[createProduct] Image upload failed:', uploadError);
+    throw new Error(`Image upload failed: ${uploadError instanceof Error ? uploadError.message : String(uploadError)}`);
+  }
 
   if (uploadedImageUrls.length === 0) throw new Error('Please upload at least one JPG/PNG image');
 
@@ -122,6 +129,7 @@ async function createProduct(formData: FormData) {
       }
     });
   } catch (error) {
+    console.error('[createProduct] Database error:', error);
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
       throw new Error(`Slug "${slug}" already exists. Please choose a different slug.`);
     }
