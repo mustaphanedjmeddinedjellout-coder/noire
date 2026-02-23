@@ -1,5 +1,4 @@
-import { mkdir, writeFile } from 'fs/promises';
-import path from 'path';
+import { put } from '@vercel/blob';
 import crypto from 'crypto';
 
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
@@ -11,19 +10,19 @@ export async function saveUploadedImages(files: File[]) {
     return [] as string[];
   }
 
-  const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'products');
-  await mkdir(uploadDir, { recursive: true });
-
   const urls: string[] = [];
 
   for (const file of validFiles) {
-    const ext = file.type === 'image/png' ? 'png' : 'jpg';
-    const fileName = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}.${ext}`;
-    const filePath = path.join(uploadDir, fileName);
+    const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+    const fileName = `products/${Date.now()}-${crypto.randomBytes(6).toString('hex')}.${ext}`;
     const bytes = await file.arrayBuffer();
 
-    await writeFile(filePath, Buffer.from(bytes));
-    urls.push(`/uploads/products/${fileName}`);
+    const blob = await put(fileName, Buffer.from(bytes), {
+      access: 'public',
+      contentType: file.type,
+    });
+
+    urls.push(blob.url);
   }
 
   return urls;
