@@ -130,6 +130,13 @@
       "p3": "نرد عادةً في نفس اليوم."
     }
   },
+  "cartReminder": {
+    "title": "{count, plural, one {منتج # في حقيبتك} other {# منتجات في حقيبتك}}",
+    "andMore": "+{count} أخرى",
+    "cta": "عرض السلة",
+    "dismiss": "إغلاق",
+    "ariaLabel": "تذكير بالسلة"
+  },
   "orderSuccess": {
     "title": "تم تأكيد الطلب",
     "subtitle": "شكرًا لشرائك",

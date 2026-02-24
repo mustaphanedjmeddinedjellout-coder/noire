@@ -130,6 +130,13 @@
       "p3": "Nous repondons generalement le jour meme."
     }
   },
+  "cartReminder": {
+    "title": "{count, plural, one {# article dans votre panier} other {# articles dans votre panier}}",
+    "andMore": "+{count} de plus",
+    "cta": "Voir le panier",
+    "dismiss": "Fermer",
+    "ariaLabel": "Rappel panier"
+  },
   "orderSuccess": {
     "title": "Commande confirmée",
     "subtitle": "Merci pour votre achat",

@@ -130,6 +130,13 @@
       "p3": "We usually respond within the same day."
     }
   },
+  "cartReminder": {
+    "title": "{count, plural, one {# item} other {# items}} in your bag",
+    "andMore": "+{count} more",
+    "cta": "Go to Cart",
+    "dismiss": "Dismiss reminder",
+    "ariaLabel": "Cart reminder"
+  },
   "orderSuccess": {
     "title": "Order Confirmed",
     "subtitle": "Thank you for your purchase",
