@@ -11,7 +11,7 @@ import { formatDzd } from '@/lib/utils';
 /* ─── Config ────────────────────────────────────────────────────────────────── */
 const STORAGE_KEY = 'noire-cart-reminder-dismissed';
 const COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24 hours
-const TRIGGER_DELAY = 60_000;             // 60 seconds idle on page
+const TRIGGER_DELAY = 6_000;              // 6 seconds after adding to cart (after add-popup fades)
 
 /* ─── Helpers ────────────────────────────────────────────────────────────────── */
 function isDismissedRecently(): boolean {
@@ -42,6 +42,7 @@ export function CartReminder() {
   const [rendered, setRendered] = useState(false);
   const [visible, setVisible] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prevCountRef = useRef(count);
 
   // Pages where the reminder should never appear
   const isExcluded = /\/(cart|checkout|order-success|admin)(\/|$)/.test(pathname);
@@ -62,19 +63,26 @@ export function CartReminder() {
     setTimeout(() => setRendered(false), 400);
   }
 
-  // Re-arm the timer whenever the pathname changes or when the cart gains items.
-  // This means each new page gives the user a fresh 60-second window.
+  // Fire TRIGGER_DELAY seconds after the cart count increases (item added)
   useEffect(() => {
-    if (timerRef.current) clearTimeout(timerRef.current);
+    const prev = prevCountRef.current;
+    prevCountRef.current = count;
 
-    // Hide & reset if no longer eligible
+    // Cart cleared or navigated to excluded page — hide
     if (count === 0 || isExcluded) {
+      if (timerRef.current) clearTimeout(timerRef.current);
       setVisible(false);
       setTimeout(() => setRendered(false), 400);
       return;
     }
 
+    // Only trigger when count went UP (item was just added)
+    if (count <= prev) return;
     if (isDismissedRecently()) return;
+
+    // Hide any existing reminder first, then re-arm
+    setVisible(false);
+    if (timerRef.current) clearTimeout(timerRef.current);
 
     timerRef.current = setTimeout(() => {
       if (!isDismissedRecently() && count > 0 && !isExcluded) {
@@ -86,7 +94,17 @@ export function CartReminder() {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname, count, isExcluded]);
+  }, [count]);
+
+  // Hide immediately when navigating to cart/checkout
+  useEffect(() => {
+    if (isExcluded) {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      setVisible(false);
+      setTimeout(() => setRendered(false), 400);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   if (!rendered || !firstItem) return null;
 
