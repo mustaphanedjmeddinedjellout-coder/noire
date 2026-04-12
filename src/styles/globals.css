@@ -323,3 +323,45 @@ html {
 .admin-matrix-cell input {
   @apply w-full bg-transparent text-center text-[13px] outline-none;
 }
+
+/* ─── Product Trust Strip ─── */
+.product-trust-strip {
+  @apply flex flex-col gap-2.5 rounded-sm border border-black/[0.06] bg-[#FAFAF8] px-4 py-3.5;
+}
+
+.product-trust-strip__item {
+  @apply flex items-center gap-2.5;
+}
+
+.product-trust-strip__icon {
+  @apply flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-black/[0.04] text-black/45;
+}
+
+.product-trust-strip__label {
+  @apply text-[12px] font-medium text-black/60 leading-tight;
+}
+
+@media (min-width: 640px) {
+  .product-trust-strip {
+    @apply flex-row justify-between gap-4 px-5 py-4;
+  }
+
+  .product-trust-strip__item {
+    @apply flex-1 justify-center;
+  }
+}
+
+/* ─── Social Proof ─── */
+.social-proof {
+  @apply mt-1.5 flex items-center gap-1.5;
+}
+
+.social-proof__stars {
+  @apply text-[13px] leading-none;
+  color: #f59e0b;
+  letter-spacing: 0.5px;
+}
+
+.social-proof__text {
+  @apply text-[11px] text-black/45 font-medium;
+}

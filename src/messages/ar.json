@@ -50,11 +50,15 @@
     "outOfStock": "نفدت الكمية",
     "related": "منتجات مشابهة",
     "color": "اللون",
-    "addToCart": "أضف إلى السلة",
+    "addToCart": "اطلب الآن – الدفع عند الاستلام",
     "stockForVariant": "يتبقى {count} للحجم/اللون المختار",
     "addedTitle": "تمت الإضافة إلى الحقيبة",
     "goToCart": "عرض السلة",
-    "continueShopping": "مواصلة التسوق"
+    "continueShopping": "مواصلة التسوق",
+    "trustCod": "الدفع عند الاستلام (COD)",
+    "trustShipping": "توصيل إلى 58 ولاية",
+    "trustExchange": "إمكانية الاستبدال",
+    "socialProof": "(4.8/5) – +120 طلب"
   },
   "cart": {
     "empty": "حقيبتك فارغة",

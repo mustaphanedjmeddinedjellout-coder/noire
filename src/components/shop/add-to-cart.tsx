@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCart } from '@/components/shop/cart-provider';
 import { createEventId, sendMetaEvent } from '@/lib/meta/client';
+import { ProductTrustStrip } from '@/components/shop/product-trust-strip';
 
 type AddToCartProps = {
   productId: string;
@@ -336,6 +337,9 @@ export function AddToCart({ productId, slug, title, image, images = [], priceDzd
         </div>
       </div>
 
+      {/* Trust strip — directly above CTA for maximum conversion impact */}
+      <ProductTrustStrip />
+
       <button
         type="button"
         className={`fixed left-0 right-0 z-50 w-full px-4 py-3 bottom-[calc(env(safe-area-inset-bottom)+72px)] sm:static sm:bottom-auto sm:px-0 ${added ? 'border border-green-700 bg-green-700 text-white' : 'btn-primary'
@@ -345,6 +349,7 @@ export function AddToCart({ productId, slug, title, image, images = [], priceDzd
       >
         {added ? t('addedTitle') : t('addToCart')}
       </button>
+
 
       {selectedVariant && selectedVariant.stock > 0 ? (
         <p className="text-xs text-black/55">{t('stockForVariant', { count: selectedVariant.stock })}</p>

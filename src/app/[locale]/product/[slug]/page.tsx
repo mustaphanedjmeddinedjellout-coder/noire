@@ -7,6 +7,7 @@ import { getProductBySlug, getRelatedProducts } from '@/lib/queries';
 import { formatDzd, getDiscountPercent, getEffectivePriceDzd } from '@/lib/utils';
 import { localizeProduct } from '@/lib/store';
 import { TrackViewContent } from '@/components/tracking/track-view-content';
+import { SocialProof } from '@/components/shop/social-proof';
 
 const CATEGORY_LABELS: Record<string, Record<string, string>> = {
   pants:   { en: 'Pants',    ar: 'سراويل',    fr: 'Pantalons' },
@@ -71,6 +72,7 @@ export default async function ProductPage({
               formatDzd(product.priceDzd, locale)
             )}
           </p>
+          <SocialProof />
         </div>
 
         {/* Gallery + Add-to-cart wired together via ProductInteractive */}
@@ -106,6 +108,7 @@ export default async function ProductPage({
                 formatDzd(product.priceDzd, locale)
               )}
             </p>
+            <SocialProof />
           </div>
 
           <p className="text-[13px] leading-7 text-black/60">{i18n.description}</p>

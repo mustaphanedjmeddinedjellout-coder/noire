@@ -50,11 +50,15 @@
     "outOfStock": "Out of stock",
     "related": "Related products",
     "color": "Color",
-    "addToCart": "Add to cart",
+    "addToCart": "Order Now – Cash on Delivery",
     "stockForVariant": "{count} left for selected size/color",
     "addedTitle": "Added to your bag",
     "goToCart": "Go to Cart",
-    "continueShopping": "Continue shopping"
+    "continueShopping": "Continue shopping",
+    "trustCod": "Cash on Delivery (COD)",
+    "trustShipping": "Delivery to all 58 wilayas",
+    "trustExchange": "Exchange available",
+    "socialProof": "(4.8/5) – +120 orders"
   },
   "cart": {
     "empty": "Your cart is empty",

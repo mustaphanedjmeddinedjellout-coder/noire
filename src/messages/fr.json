@@ -50,11 +50,15 @@
     "outOfStock": "Rupture de stock",
     "related": "Produits similaires",
     "color": "Couleur",
-    "addToCart": "Ajouter au panier",
+    "addToCart": "Commander maintenant – Paiement à la livraison",
     "stockForVariant": "{count} restant pour la taille/couleur choisie",
     "addedTitle": "Ajouté à votre panier",
     "goToCart": "Voir le panier",
-    "continueShopping": "Continuer vos achats"
+    "continueShopping": "Continuer vos achats",
+    "trustCod": "Paiement à la livraison (COD)",
+    "trustShipping": "Livraison dans les 58 wilayas",
+    "trustExchange": "Échange possible",
+    "socialProof": "(4.8/5) – +120 commandes"
   },
   "cart": {
     "empty": "Votre panier est vide",
